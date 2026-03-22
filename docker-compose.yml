@@ -1,4 +1,5 @@
 version: '3.8'
+
 services:
   mysql:
     image: mysql:8.0
@@ -7,24 +8,21 @@ services:
       - .env.${ENV}
     ports:
       - "3306:3306"
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
-      retries: 5
+    volumes:
+      - mysql_data:/var/lib/mysql
 
   backend:
-    build: ./backend
+    image: rohit7669/testapp-backend:latest
     container_name: backend
     env_file:
       - .env.${ENV}
     ports:
       - "8080:8080"
     depends_on:
-      mysql:
-        condition: service_healthy
+      - mysql
 
   frontend:
-    build: ./frontend
+    image: rohit7669/testapp-frontend:latest
     container_name: frontend
     env_file:
       - .env.${ENV}
@@ -32,3 +30,6 @@ services:
       - "3000:80"
     depends_on:
       - backend
+
+volumes:
+  mysql_data:

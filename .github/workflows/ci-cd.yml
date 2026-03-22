@@ -4,6 +4,17 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      deploy_env:
+        description: 'Choose environment to deploy'
+        required: true
+        default: dev
+        type: choice
+        options:
+          - dev
+          - qa
+          - prod
 
 jobs:
   build:
@@ -23,57 +34,26 @@ jobs:
 
       - name: Build and push backend image
         run: |
-          docker build -t your-dockerhub-username/testapp-backend:latest ./backend
-          docker push your-dockerhub-username/testapp-backend:latest
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/testapp-backend:latest ./spring-boot-server
+          docker push ${{ secrets.DOCKER_USERNAME }}/testapp-backend:latest
 
       - name: Build and push frontend image
         run: |
-          docker build -t your-dockerhub-username/testapp-frontend:latest ./frontend
-          docker push your-dockerhub-username/testapp-frontend:latest
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/testapp-frontend:latest ./react-client
+          docker push ${{ secrets.DOCKER_USERNAME }}/testapp-frontend:latest
 
-  deploy-dev:
+  deploy:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: SSH to Dev server
+      - name: Deploy to selected environment
         uses: appleboy/ssh-action@v0.1.7
         with:
-          host: ${{ secrets.DEV_SERVER }}
+          host: ${{ secrets[github.event.inputs.deploy_env | upper ~ '_SERVER'] }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd /home/ubuntu/TestApp
-            ENV=dev docker-compose pull
-            ENV=dev docker-compose up -d
-
-  deploy-qa:
-    runs-on: ubuntu-latest
-    needs: build
-    if: github.event.inputs.deploy_env == 'qa'
-    steps:
-      - name: SSH to QA server
-        uses: appleboy/ssh-action@v0.1.7
-        with:
-          host: ${{ secrets.QA_SERVER }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          script: |
-            cd /home/ubuntu/TestApp
-            ENV=qa docker-compose pull
-            ENV=qa docker-compose up -d
-
-  deploy-prod:
-    runs-on: ubuntu-latest
-    needs: build
-    if: github.event.inputs.deploy_env == 'prod'
-    steps:
-      - name: SSH to Prod server
-        uses: appleboy/ssh-action@v0.1.7
-        with:
-          host: ${{ secrets.PROD_SERVER }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          script: |
-            cd /home/ubuntu/TestApp
-            ENV=prod docker-compose pull
-            ENV=prod docker-compose up -d
+            echo "Deploying to ${{ github.event.inputs.deploy_env }} environment"
+            ENV=${{ github.event.inputs.deploy_env }} docker-compose pull
+            ENV=${{ github.event.inputs.deploy_env }} docker-compose up -d
