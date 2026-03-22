@@ -26,7 +26,7 @@ jobs:
 
       - name: Build and push backend image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/testapp-backend:latest ./backend
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/testapp-backend:latest ./spring-boot-server
           docker push ${{ secrets.DOCKER_USERNAME }}/testapp-backend:latest
 
       - name: Build and push frontend image
