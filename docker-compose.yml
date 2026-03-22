@@ -3,20 +3,17 @@ version: '3.8'
 services:
   mysql:
     image: mysql:8.0
-    container_name: mysql_${ENV}
+    container_name: mysql
     env_file:
       - .env.${ENV}
     ports:
       - "3306:3306"
     volumes:
-      - mysql_data_${ENV}:/var/lib/mysql
+      - mysql_data:/var/lib/mysql
 
   backend:
-    build:
-      context: ./spring-boot-server
-      dockerfile: Dockerfile
     image: rohit7669/testapp-backend:latest
-    container_name: backend_${ENV}
+    container_name: backend
     env_file:
       - .env.${ENV}
     ports:
@@ -25,19 +22,16 @@ services:
       - mysql
 
   frontend:
-    build:
-      context: ./react-client
-      dockerfile: Dockerfile
     image: rohit7669/testapp-frontend:latest
-    container_name: frontend_${ENV}
+    container_name: frontend
     env_file:
       - .env.${ENV}
     ports:
       - "3000:80"
     depends_on:
       - backend
+    environment:
+      - REACT_APP_API_URL=${BACKEND_URL}
 
 volumes:
-  mysql_data_dev:
-  mysql_data_qa:
-  mysql_data_prod:
+  mysql_data:
