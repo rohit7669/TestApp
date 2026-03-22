@@ -24,14 +24,13 @@ services:
   frontend:
     image: rohit7669/testapp-frontend:latest
     container_name: frontend
-    env_file:
-      - .env.${ENV}
     ports:
       - "3000:80"
     depends_on:
       - backend
     environment:
-      - REACT_APP_API_URL=http://3.109.152.237:8080/api
+      # Explicitly set the public backend URL for frontend
+      REACT_APP_API_URL: "http://3.109.152.237:8080/api"
 
 volumes:
   mysql_data:
