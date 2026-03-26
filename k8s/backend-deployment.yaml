@@ -24,3 +24,5 @@ spec:
               value: testuser
             - name: SPRING_DATASOURCE_PASSWORD
               value: testpassword
+            - name: BACKEND_URL
+              value: "/api"   # <-- use relative path, no IP
