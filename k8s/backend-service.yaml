@@ -3,11 +3,10 @@ kind: Service
 metadata:
   name: backend-service
 spec:
-  type: NodePort
+  type: ClusterIP      # <-- change from NodePort to ClusterIP
   selector:
     app: testapp-backend
   ports:
     - protocol: TCP
-      port: 8080
-      targetPort: 8080
-      nodePort: 30081
+      port: 8080       # the port your backend listens on inside the cluster
+      targetPort: 8080 # matches containerPort in backend deployment
