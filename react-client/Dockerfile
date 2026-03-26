@@ -6,8 +6,7 @@ RUN npm install
 COPY . .
 RUN npm run build
 
-# Copy env.js after build
-COPY public/env.js /usr/share/nginx/html/env.js
+
 
 # -------- Run Stage --------
 FROM nginx:alpine
