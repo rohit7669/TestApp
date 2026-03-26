@@ -25,4 +25,4 @@ spec:
             - name: SPRING_DATASOURCE_PASSWORD
               value: testpassword
             - name: BACKEND_URL
-              value: "http://52.66.205.79:30081/api"
+              value: "/api"
