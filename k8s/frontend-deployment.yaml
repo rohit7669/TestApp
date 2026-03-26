@@ -1,9 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: testapp-frontend
 spec:
-  containers:
-    - name: frontend
-      image: rohit7669/testapp-frontend:latest
-      ports:
-        - containerPort: 80
-      env:
-        - name: REACT_APP_API_URL
-          value: "/api"
+  replicas: 2
+  selector:
+    matchLabels:
+      app: testapp-frontend
+  template:
+    metadata:
+      labels:
+        app: testapp-frontend
+    spec:
+      containers:
+        - name: frontend
+          image: rohit7669/testapp-frontend:latest
+          ports:
+            - containerPort: 80
+          env:
+            - name: REACT_APP_API_URL
+              value: "/api"
